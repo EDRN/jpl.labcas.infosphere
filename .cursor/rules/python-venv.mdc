@@ -1,0 +1,13 @@
+---
+description: Use the project virtualenv for Python and pip
+alwaysApply: true
+---
+
+# Python and pip
+
+Run Python and pip only via the project virtual environment:
+
+- **Python:** `.venv/bin/python` (or `python` after `source .venv/bin/activate`)
+- **pip:** `.venv/bin/python -m pip` (never rely on a global `pip` on PATH)
+
+From the repo root, prefer absolute or relative paths like `./.venv/bin/python -m pip install ...`.

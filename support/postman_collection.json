@@ -1,0 +1,87 @@
+{
+  "info": {
+    "_postman_id": "66678065-7961-4fae-955c-86e7ab3ab6ff",
+    "name": "LabCAS Infosphere API",
+    "description": "Infosphere is the informational API for [LabCAS](https://edrn-labcas.jpl.nasa.gov/). Note that some of the endpoints may require authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "10615558"
+  },
+  "item": [
+    {
+      "name": "Health Check (ping)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ping",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ping"
+          ]
+        },
+        "description": "Returns current UTC datet and time when service is healthy."
+      },
+      "response": []
+    },
+    {
+      "name": "Imaging Report (JSON/CSV)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "{{username}}",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "{{password}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/imaging?format={{format}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "imaging"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "{{format}}",
+              "description": "Accepted values: json (default), csv"
+            }
+          ]
+        },
+        "description": "This returns imaging events for the LabCAS data collections `Lung_Team_Project_2` and `Prostate_MRI`. Each record consists of the collection, the blinded site ID, and the event ID.\n\nNote: this is a protected endpoint. Requires valid LDAP-backed HTTP Basic credentials and group membership."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:8998"
+    },
+    {
+      "key": "username",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "format",
+      "value": "json"
+    }
+  ]
+}
