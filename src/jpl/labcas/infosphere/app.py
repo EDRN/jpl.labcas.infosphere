@@ -6,11 +6,12 @@ from __future__ import annotations
 
 import base64, binascii, csv, io, json
 from datetime import datetime, timezone
+from importlib.resources import files
 
 from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import HTMLResponse, JSONResponse, Response
 from starlette.routing import Route
 
 from ._imaging import imaging_report
@@ -75,6 +76,11 @@ def _report_json(report: dict[str, dict[str, set[str]]]) -> str:
     return json.dumps(rows, indent=4) + '\n'
 
 
+def _postman_collection_bytes() -> bytes:
+    '''Read the packaged Postman collection JSON bytes.'''
+    return files('jpl.labcas.infosphere').joinpath('resources/postman_collection.json').read_bytes()
+
+
 def create_app(
     ldap_uri: str = DEFAULT_LDAP_URI,
     group_dn: str = DEFAULT_GROUP_DN,
@@ -124,10 +130,41 @@ def create_app(
             return Response(body, media_type='text/csv; charset=utf-8')
         return JSONResponse({'detail': f'Invalid format: {fmt!r}'}, status_code=400)
 
+    # API docs endpoint
+    async def docs_home(request: Request) -> HTMLResponse:
+        '''Return a simple docs landing page.'''
+        postman_url = str(request.url_for('postman_collection'))
+        body = f'''<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabCAS Infosphere API Docs</title>
+  </head>
+  <body>
+    <h1>LabCAS Infosphere API Docs</h1>
+    <p>Import the Postman collection from this URL:</p>
+    <p><a href="{postman_url}">{postman_url}</a></p>
+  </body>
+</html>
+'''
+        return HTMLResponse(body)
+
+    # API docs endpoint
+    async def postman_collection(_request: Request) -> Response:
+        '''Return the packaged Postman collection JSON.'''
+        return Response(
+            _postman_collection_bytes(),
+            media_type='application/json; charset=utf-8',
+            headers={'Content-Disposition': 'inline; filename="postman_collection.json"'},
+        )
+
     return Starlette(
         routes=[
             Route('/ping', endpoint=ping, methods=['GET']),
             Route('/imaging', endpoint=imaging, methods=['GET']),
+            Route('/docs', endpoint=docs_home, methods=['GET']),
+            Route('/docs/postman-collection', endpoint=postman_collection, methods=['GET'], name='postman_collection'),
         ],
     )
 
