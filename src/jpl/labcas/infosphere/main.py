@@ -45,6 +45,7 @@ def main():
         user_dn_template=args.ldap_user_dn_template,
         solr_url=solr_url,
         client_secret=client_secret,
+        subpath=args.subpath,
     )
     cert_path, key_path = create_self_signed_tls_files()
     try:

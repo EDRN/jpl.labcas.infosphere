@@ -72,4 +72,10 @@ def add_argparse_options(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
         default=USER_DN_TEMPLATE,
         help='Bind DN template with {username} placeholder (default %(default)s)',
     )
+    parser.add_argument(
+        '--subpath',
+        metavar='PATH',
+        default='',
+        help='URL path prefix when running behind a reverse proxy (example: /infosphere)',
+    )
     return parser

@@ -48,6 +48,14 @@ def _normalize_solr_url(url: str) -> str:
     return url if url.endswith('/') else url + '/'
 
 
+def _normalize_subpath(subpath: str) -> str:
+    '''Normalize URL subpath to "/prefix" form or empty string.'''
+    value = (subpath or '').strip()
+    if not value or value == '/':
+        return ''
+    return '/' + value.strip('/')
+
+
 def _report_rows(report: dict[str, dict[str, dict[str, str]]]) -> list[dict[str, str]]:
     '''Flatten the imaging report into sorted row dictionaries.'''
     rows: list[dict[str, str]] = []
@@ -92,9 +100,11 @@ def create_app(
     user_dn_template: str = USER_DN_TEMPLATE,
     solr_url: str | None = None,
     client_secret: str | None = None,
+    subpath: str = '',
 ) -> Starlette:
     '''Build and configure the Starlette ASGI application.'''
     solr_base = _normalize_solr_url(solr_url or DEFAULT_SOLR_URL)
+    configured_subpath = _normalize_subpath(subpath)
 
     # Health check endpoint
     async def ping(_request: Request) -> JSONResponse:
@@ -140,11 +150,12 @@ def create_app(
     # API docs endpoint
     async def docs_home(request: Request) -> HTMLResponse:
         '''Return a simple docs landing page.'''
-        root_path = request.scope.get('root_path', '').rstrip('/')
+        root_path = _normalize_subpath(request.scope.get('root_path', ''))
+        effective_subpath = root_path or configured_subpath
         postman_path = request.app.url_path_for('postman_collection')
         postman_url = str(
             request.url.replace(
-                path=f'{root_path}{postman_path}',
+                path=f'{effective_subpath}{postman_path}',
                 query='',
                 fragment='',
             )
