@@ -141,7 +141,7 @@ def create_app(
     async def docs_home(request: Request) -> HTMLResponse:
         '''Return a simple docs landing page.'''
         root_path = request.scope.get('root_path', '').rstrip('/')
-        postman_path = request.url_path_for('postman_collection')
+        postman_path = request.app.url_path_for('postman_collection')
         postman_url = str(
             request.url.replace(
                 path=f'{root_path}{postman_path}',
