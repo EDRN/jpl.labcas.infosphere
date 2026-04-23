@@ -8,6 +8,7 @@ dependencies = [
     'pysolr ~= 3.10.0',
     'starlette ~= 0.46.0',
     'uvicorn ~= 0.34.0',
+    'requests ~= 2.33.1',
 ]
 authors = [
     {name = 'Sean Kelly', email='kelly@seankelly.biz'}

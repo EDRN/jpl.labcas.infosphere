@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-import base64, binascii, csv, io, json
+import base64, binascii, csv, io, json, logging
 from datetime import datetime, timezone
 from importlib.resources import files
 
@@ -19,7 +19,7 @@ from .const import DEFAULT_GROUP_DN, DEFAULT_LDAP_URI, DEFAULT_SOLR_URL, USER_DN
 from . import ldap as ldap_auth
 
 _BASIC_REALM = 'LabCAS Infosphere'
-
+_logger = logging.getLogger(__name__)
 
 def _www_authenticate() -> str:
     '''Return the HTTP Basic auth challenge header value.'''
@@ -48,29 +48,34 @@ def _normalize_solr_url(url: str) -> str:
     return url if url.endswith('/') else url + '/'
 
 
-def _report_rows(report: dict[str, dict[str, set[str]]]) -> list[dict[str, str]]:
+def _report_rows(report: dict[str, dict[str, dict[str, str]]]) -> list[dict[str, str]]:
     '''Flatten the imaging report into sorted row dictionaries.'''
     rows: list[dict[str, str]] = []
     for collection in sorted(report.keys()):
         for site in sorted(report[collection].keys()):
-            for event in sorted(report[collection][site]):
-                rows.append({'collection': collection, 'site': site, 'event': event})
+            for event in sorted(report[collection][site].keys()):
+                rows.append({
+                    'collection': collection,
+                    'site': site,
+                    'event': event,
+                    'participantId': report[collection][site][event],
+                })
     return rows
 
 
-def _report_csv(report: dict[str, dict[str, set[str]]]) -> str:
+def _report_csv(report: dict[str, dict[str, dict[str, str]]]) -> str:
     '''Serialize the imaging report to CSV text.'''
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(['collection', 'site', 'event'])
+    writer.writerow(['collection', 'site', 'event', 'participantId'])
     for collection in sorted(report.keys()):
         for site in sorted(report[collection].keys()):
-            for event in sorted(report[collection][site]):
-                writer.writerow([collection, site, event])
+            for event in sorted(report[collection][site].keys()):
+                writer.writerow([collection, site, event, report[collection][site][event]])
     return buf.getvalue()
 
 
-def _report_json(report: dict[str, dict[str, set[str]]]) -> str:
+def _report_json(report: dict[str, dict[str, dict[str, str]]]) -> str:
     '''Serialize the imaging report rows to pretty-printed JSON.'''
     rows = _report_rows(report)
     return json.dumps(rows, indent=4) + '\n'
@@ -86,6 +91,7 @@ def create_app(
     group_dn: str = DEFAULT_GROUP_DN,
     user_dn_template: str = USER_DN_TEMPLATE,
     solr_url: str | None = None,
+    client_secret: str | None = None,
 ) -> Starlette:
     '''Build and configure the Starlette ASGI application.'''
     solr_base = _normalize_solr_url(solr_url or DEFAULT_SOLR_URL)
@@ -106,6 +112,7 @@ def create_app(
                 headers={'WWW-Authenticate': _www_authenticate()},
             )
         username, password = parsed
+        _logger.info('Handling imaging request for user: %s', username)
         bind_dn = ldap_auth.user_dn(username, user_dn_template)
         ok = await run_in_threadpool(
             ldap_auth.authenticate_and_in_group,
@@ -120,7 +127,7 @@ def create_app(
                 status_code=401,
                 headers={'WWW-Authenticate': _www_authenticate()},
             )
-        report = await run_in_threadpool(imaging_report, solr_base)
+        report = await run_in_threadpool(imaging_report, solr_base, client_secret)
         fmt = request.query_params.get('format', 'json')
         if fmt == 'json':
             body = _report_json(report)

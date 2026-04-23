@@ -2,7 +2,7 @@
 
 '''🧠 LabCAS Infosphere: the information API for the Laboratory Catalog and Archive Service'''
 
-import argparse, logging, os, pysolr, uvicorn
+import argparse, getpass, logging, os, pysolr, sys, uvicorn
 from .app import create_app
 from .argparse import add_argparse_options
 from .tls import create_self_signed_tls_files
@@ -26,6 +26,16 @@ def main():
     parser = add_argparse_options(parser)
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format='%(levelname)s %(message)s')
+
+    # Get the DMCC client secret from the environment or prompt the user
+    if not os.getenv('DMCC_CLIENT_SECRET'):
+        client_secret = getpass.getpass('DMCC client secret: ').strip()
+        if not client_secret:
+            _logger.error('DMCC client secret was not provided')
+            return -1
+    else:
+        client_secret = os.getenv('DMCC_CLIENT_SECRET')
+
     _logger.info('Starting LabCAS Infosphere v%s with Solr at %s', VERSION, args.solr)
     solr_url = args.solr if args.solr.endswith('/') else args.solr + '/'
 
@@ -34,6 +44,7 @@ def main():
         group_dn=args.ldap_group_dn,
         user_dn_template=args.ldap_user_dn_template,
         solr_url=solr_url,
+        client_secret=client_secret,
     )
     cert_path, key_path = create_self_signed_tls_files()
     try:
@@ -49,4 +60,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
