@@ -11,10 +11,10 @@ This API server currently provides:
 
 - **Health check endpoint**: `GET /ping` returns the current UTC timestamp so clients and operators can quickly verify service availability.
 - **Protected imaging endpoint**: `GET /imaging` requires HTTP Basic authentication and validates users against LDAP group membership.
-- **Imaging coverage report**: aggregates distinct `(site, event)` pairs from Solr for the `Lung_Team_Project_2` and `Prostate_MRI` collections.
+- **Imaging coverage report**: aggregates distinct `(site, event, participantID)` values from Solr and the DMCC API for the `Lung_Team_Project_2` and `Prostate_MRI` collections.
 - **Multiple response formats**: `GET /imaging` supports `?format=json` (default) and `?format=csv`.
 - **HTTPS by default**: launches with temporary self-signed TLS certificates for encrypted local transport.
-- **Configurable runtime options**: command-line flags let you set Solr URL, LDAP connection settings, port, and logging verbosity.
+- **Configurable runtime options**: command-line flags let you set Solr URL, LDAP connection settings, port, subpath handling, and logging verbosity.
 
 
 ## 📦 Installation
@@ -41,6 +41,8 @@ Launch the server by running
     .venv/bin/labcas-infosphere
 
 Run it with `--help` to see the options. After installation, you can also run modules with `.venv/bin/python -m jpl.labcas.infosphere.main`.
+
+👉 **Note**: The Infosphere uses the DMCC API which requires a client secret. This can be provided using an environment variable, `DMCC_CLIENT_SECRET`. If not specified, you'll be prompted to enter it.
 
 
 ## 📄 License
