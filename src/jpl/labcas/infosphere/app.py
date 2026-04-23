@@ -140,7 +140,15 @@ def create_app(
     # API docs endpoint
     async def docs_home(request: Request) -> HTMLResponse:
         '''Return a simple docs landing page.'''
-        postman_url = str(request.url_for('postman_collection'))
+        root_path = request.scope.get('root_path', '').rstrip('/')
+        postman_path = request.url_path_for('postman_collection')
+        postman_url = str(
+            request.url.replace(
+                path=f'{root_path}{postman_path}',
+                query='',
+                fragment='',
+            )
+        )
         body = f'''<!doctype html>
 <html lang="en">
   <head>
