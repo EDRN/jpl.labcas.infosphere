@@ -32,6 +32,7 @@ To install from source:
     cd jpl.labcas.infosphere
     python3 -m venv .venv
     .venv/bin/pip install --editable .
+    pre-commit install
 
 
 ## 🚀 Usage
