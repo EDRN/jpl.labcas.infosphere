@@ -7,7 +7,9 @@ The [LabCAS](https://edrn-labcas.jpl.nasa.gov/) Infosphere is an API that provid
 
 To retreive the imaging coverage report using the `curl` command:
 
-    curl --silent --user 'secret:p4ssw0rd' https://edrn-labcas.jpl.nasa.gov/infospshere/imaging
+    curl --silent \
+        --user 'secret:p4ssw0rd' \
+        https://edrn-labcas.jpl.nasa.gov/infospshere/imaging
 
 Replace the username `secret` and password `p4ssw0rd` with the correct credentials. You'll see a response similar to:
 ```json
@@ -27,7 +29,9 @@ Replace the username `secret` and password `p4ssw0rd` with the correct credentia
 ```
 To have the data formatted as CSV, run:
 
-    curl --silent --user 'secret:p4ssw0rd' 'https://edrn-labcas.jpl.nasa.gov/infospshere/imaging?format=csv'
+    curl --silent \
+        --user 'secret:p4ssw0rd' \
+        'https://edrn-labcas.jpl.nasa.gov/infospshere/imaging?format=csv'
 
 The response will be similar to:
 ```csv
@@ -40,6 +44,8 @@ To retreive the Postman collection:
 
     curl --silent https://edrn-labcas.jpl.nasa.gov/infospshere/docs/postman-collection
 
+You can then explore and test the API using the [Postman](https://www.postman.com/) tool.
+
 
 ## 🎯 Features
 
@@ -49,7 +55,7 @@ This API server currently provides:
 - **Protected imaging endpoint**: `GET /imaging` requires HTTP Basic authentication and validates users against LDAP group membership.
 - **Imaging coverage report**: aggregates distinct `(site, event, participantID)` values from Solr and the DMCC API for the `Lung_Team_Project_2` and `Prostate_MRI` collections.
 - **Multiple response formats**: `GET /imaging` supports `?format=json` (default) and `?format=csv`.
-- **[Postman](https://www.postman.com) specification**. You can retrieve a Postman-compatible specification of the API by following the link from `GET /docs`.
+- **Postman specification**. You can retrieve a Postman-compatible specification of the API by following the link from `GET /docs`.
 
 These endpoints are typically available at `https://SERVER/SUBPATH/ENDPOINT`, such as `https://edrn-labcas.jpl.nasa.gov/infosphere/imaging`. The `SUBPATH` may be omitted depending on configuration.
 
