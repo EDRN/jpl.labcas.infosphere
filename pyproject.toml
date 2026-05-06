@@ -4,9 +4,9 @@ dynamic = ['version']
 requires-python = '>=3.12'
 dependencies = [
     'ldap3 ~= 2.9.0',
-    'cryptography ~= 44.0.0',
+    'cryptography ~= 46.0.7',
     'pysolr ~= 3.10.0',
-    'starlette ~= 0.46.0',
+    'starlette ~= 0.49.1',
     'uvicorn ~= 0.34.0',
     'requests ~= 2.33.1',
 ]
