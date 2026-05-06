@@ -153,13 +153,7 @@ def create_app(
         root_path = _normalize_subpath(request.scope.get('root_path', ''))
         effective_subpath = root_path or configured_subpath
         postman_path = request.app.url_path_for('postman_collection')
-        postman_url = str(
-            request.url.replace(
-                path=f'{effective_subpath}{postman_path}',
-                query='',
-                fragment='',
-            )
-        )
+        postman_url = f'{effective_subpath}{postman_path}'
         body = f'''<!doctype html>
 <html lang="en">
   <head>
