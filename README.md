@@ -9,7 +9,7 @@ To retreive the imaging coverage report using the `curl` command:
 
     curl --silent \
         --user 'secret:p4ssw0rd' \
-        https://edrn-labcas.jpl.nasa.gov/infospshere/imaging
+        https://edrn-labcas.jpl.nasa.gov/infosphere/imaging
 
 Replace the username `secret` and password `p4ssw0rd` with the correct credentials. You'll see a response similar to:
 ```json
