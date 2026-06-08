@@ -31,7 +31,7 @@ To have the data formatted as CSV, run:
 
     curl --silent \
         --user 'secret:p4ssw0rd' \
-        'https://edrn-labcas.jpl.nasa.gov/infospshere/imaging?format=csv'
+        'https://edrn-labcas.jpl.nasa.gov/infosphere/imaging?format=csv'
 
 The response will be similar to:
 ```csv
@@ -42,7 +42,7 @@ Lung_Team_Project_2,AvinPOWpghrek,2345678,11223344556
 
 To retreive the Postman collection:
 
-    curl --silent https://edrn-labcas.jpl.nasa.gov/infospshere/docs/postman-collection
+    curl --silent https://edrn-labcas.jpl.nasa.gov/infosphere/docs/postman-collection
 
 You can then explore and test the API using the [Postman](https://www.postman.com/) tool.
 
